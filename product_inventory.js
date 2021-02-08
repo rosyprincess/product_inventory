@@ -109,14 +109,12 @@ async function writeIterableToFile(iterable, filePath) {
     const writable = fs.createWriteStream('log.txt', {flags: 'a'});
     
     for await (const chunk of iterable) {
-      if (!writable.write(chunk)) { // (B)
-        // Handle backpressure
+      if (!writable.write(chunk)) {
         await once(writable, 'drain');
       }
     }
     writable.end(); // (C)
     batch = [];
-    // Wait until done. Throws if there are errors.
     await finished(writable);
     // console.log(iterable, ` iterable`);
   }
